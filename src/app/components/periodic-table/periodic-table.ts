@@ -33,7 +33,6 @@ export class PeriodicTable implements OnInit {
   private filterTimeout: any;
 
   constructor() {
-    // Debounce filter input
     effect(() => {
       const filter = this.filterInput();
       clearTimeout(this.filterTimeout);

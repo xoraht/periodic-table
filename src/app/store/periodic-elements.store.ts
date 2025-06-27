@@ -1,4 +1,5 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { computed } from '@angular/core';
+import { signalStore, withState, withComputed, withMethods, patchState } from '@ngrx/signals';
 import { PeriodicElement } from '../models/periodic-element.interface';
 
 const ELEMENT_DATA: PeriodicElement[] = [
@@ -14,50 +15,57 @@ const ELEMENT_DATA: PeriodicElement[] = [
   {position: 10, name: 'Neon', weight: 20.1797, symbol: 'Ne'},
 ];
 
-@Injectable({
-  providedIn: 'root'
-})
-export class PeriodicElementsStore {
-  private elements = signal<PeriodicElement[]>([]);
-  private filter = signal<string>('');
-  private loading = signal<boolean>(false);
-
-  filteredElements = computed(() => {
-    const filterValue = this.filter().toLowerCase();
-    if (!filterValue) {
-      return this.elements();
-    }
-    return this.elements().filter(element =>
-      element.name.toLowerCase().includes(filterValue) ||
-      element.symbol.toLowerCase().includes(filterValue) ||
-      element.position.toString().includes(filterValue) ||
-      element.weight.toString().includes(filterValue)
-    );
-  });
-
-  readonly loading$ = this.loading.asReadonly();
-
-  loadElements(): void {
-    this.loading.set(true);
-    setTimeout(() => {
-      this.elements.set(ELEMENT_DATA);
-      this.loading.set(false);
-    }, 1000);
-  }
-
-  updateFilter(filter: string): void {
-    this.filter.set(filter);
-  }
-
-  updateElement(updatedElement: PeriodicElement): void {
-    const currentElements = this.elements();
-    const updatedElements = currentElements.map(element =>
-      element.position === updatedElement.position ? updatedElement : element
-    );
-    this.elements.set(updatedElements);
-  }
-
-  isLoading() {
-    return this.loading$();
-  }
+interface PeriodicElementsState {
+  elements: PeriodicElement[];
+  filter: string;
+  loading: boolean;
 }
+
+const initialState: PeriodicElementsState = {
+  elements: [],
+  filter: '',
+  loading: false
+};
+
+export const PeriodicElementsStore = signalStore(
+  { providedIn: 'root' },
+  withState(initialState),
+  withComputed(({ elements, filter }) => ({
+    filteredElements: computed(() => {
+      const filterValue = filter().toLowerCase();
+      if (!filterValue) {
+        return elements();
+      }
+      return elements().filter(element =>
+        element.name.toLowerCase().includes(filterValue) ||
+        element.symbol.toLowerCase().includes(filterValue) ||
+        element.position.toString().includes(filterValue) ||
+        element.weight.toString().includes(filterValue)
+      );
+    })
+  })),
+  withMethods((store) => ({
+    loadElements(): void {
+      patchState(store, { loading: true });
+      setTimeout(() => {
+        patchState(store, { elements: ELEMENT_DATA, loading: false });
+      }, 1000);
+    },
+    
+    updateFilter(filter: string): void {
+      patchState(store, { filter });
+    },
+    
+    updateElement(updatedElement: PeriodicElement): void {
+      const currentElements = store.elements();
+      const updatedElements = currentElements.map(element =>
+        element.position === updatedElement.position ? updatedElement : element
+      );
+      patchState(store, { elements: updatedElements });
+    },
+    
+    isLoading(): boolean {
+      return store.loading();
+    }
+  }))
+);
