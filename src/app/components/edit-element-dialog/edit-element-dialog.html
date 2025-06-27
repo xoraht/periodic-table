@@ -1,0 +1,28 @@
+<div mat-dialog-title class="dialog-title">Edytuj pierwiastek</div>
+
+<div mat-dialog-content class="dialog-content">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Numer atomowy</mat-label>
+    <input matInput type="number" [(ngModel)]="data.position">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Nazwa</mat-label>
+    <input matInput [(ngModel)]="data.name">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Masa atomowa</mat-label>
+    <input matInput type="number" step="0.0001" [(ngModel)]="data.weight">
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Symbol</mat-label>
+    <input matInput [(ngModel)]="data.symbol">
+  </mat-form-field>
+</div>
+
+<div mat-dialog-actions class="dialog-actions">
+  <button mat-button (click)="onCancel()">Anuluj</button>
+  <button mat-raised-button color="primary" (click)="onSave()">Zapisz</button>
+</div>

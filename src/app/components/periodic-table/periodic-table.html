@@ -1,0 +1,52 @@
+<div class="periodic-table-container">
+  <div class="filter-container">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Filtruj pierwiastki</mat-label>
+      <input matInput placeholder="Szukaj..." (input)="onFilterChange($event)">
+    </mat-form-field>
+  </div>
+
+  @if (store.isLoading()) {
+    <div class="loading-container">
+      <mat-spinner></mat-spinner>
+      <p>Ładowanie danych...</p>
+    </div>
+  } @else {
+    <div class="table-container">
+      <table mat-table [dataSource]="store.filteredElements()" class="mat-elevation-8">
+        
+        <ng-container matColumnDef="position">
+          <th mat-header-cell *matHeaderCellDef>Numer</th>
+          <td mat-cell *matCellDef="let element">{{element.position}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Nazwa</th>
+          <td mat-cell *matCellDef="let element">{{element.name}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="weight">
+          <th mat-header-cell *matHeaderCellDef>Masa atomowa</th>
+          <td mat-cell *matCellDef="let element">{{element.weight}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="symbol">
+          <th mat-header-cell *matHeaderCellDef>Symbol</th>
+          <td mat-cell *matCellDef="let element">{{element.symbol}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Akcje</th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-raised-button color="primary" (click)="editElement(element)">
+              Edytuj
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  }
+</div>
